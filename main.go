@@ -22,6 +22,8 @@ func readPass(filePath string) string {
 
 	var line int
 	var passLine string
+	var passVal string
+
 	for txtScanner.Scan() {
 		if line == 0 {
 			passLine = txtScanner.Text()
@@ -30,18 +32,19 @@ func readPass(filePath string) string {
 	}
 
 	if len(passLine) > 9 {
-		var passVal = passLine[10:]
-		return passVal
-
+		passVal = passLine[10:]
 	} else {
-
-		return ""
-
+		passVal = ""
 	}
+
+	file.Close()
+
+	return passVal
 
 }
 
 // used to update txt file
+
 func writePass(filePath string) {
 
 }
@@ -76,4 +79,5 @@ func main() {
 			fmt.Println(toDisplay)
 		}
 	}
+
 }
