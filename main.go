@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -19,6 +20,7 @@ func readPass(filePath string) string {
 	}
 
 	txtScanner := bufio.NewScanner(file)
+	defer file.Close()
 
 	var line int
 	var passLine string
@@ -37,15 +39,34 @@ func readPass(filePath string) string {
 		passVal = ""
 	}
 
-	file.Close()
-
 	return passVal
 
 }
 
 // used to update txt file
 
-func writePass(filePath string) {
+func writePass(filePath string, newPassword string) {
+
+	file, err := os.ReadFile("password.txt")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	rows := strings.Split(string(file), "\n")
+
+	for i, row := range rows {
+		if strings.Contains(row, "password: ") {
+			updatedPassLine := fmt.Sprintf("password: %s", newPassword)
+			rows[i] = updatedPassLine
+		}
+	}
+
+	var output = strings.Join(rows, "\n")
+	err = ioutil.WriteFile("password.txt", []byte(output), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
 
@@ -63,20 +84,34 @@ func main() {
 
 	fmt.Println("Provide password and press ENTER...")
 
-	var currentPass = readPass(`C:\Users\Omen\Desktop\Go\login\password.txt`)
+	var currentPassPath = readPass(`password.txt`)
 
 	var tries int
+	var loginVerified bool
 
 	for i := 0; i < 3; i++ {
 		var myInput = readConsoleInput()
 
-		if myInput == currentPass {
+		if myInput == currentPassPath {
 			fmt.Println("Login succcessful")
+			loginVerified = true
 			break
 		} else {
 			tries = 2 - i
 			toDisplay := fmt.Sprintf("Incorrect login, you have %d tries left", tries)
 			fmt.Println(toDisplay)
+		}
+	}
+
+	if loginVerified {
+		fmt.Println("Would you like to change your password ? Y/N")
+		var answer = readConsoleInput()
+		if answer == "Y" {
+			fmt.Println("Please provide new password")
+			var newPasswordValue = readConsoleInput()
+
+			writePass(currentPassPath, newPasswordValue)
+			fmt.Println("Password updated ! \n Have a nice day !")
 		}
 	}
 
