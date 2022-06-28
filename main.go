@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -63,7 +62,7 @@ func writePass(filePath string, newPassword string) {
 	}
 
 	var output = strings.Join(rows, "\n")
-	err = ioutil.WriteFile("password.txt", []byte(output), 0644)
+	err = os.WriteFile("password.txt", []byte(output), 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
